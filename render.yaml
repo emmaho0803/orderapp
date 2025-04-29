@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: line-orderbot
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: CHANNEL_ACCESS_TOKEN
+        value: your-channel-access-token-here
+      - key: CHANNEL_SECRET
+        value: your-channel-secret-here
