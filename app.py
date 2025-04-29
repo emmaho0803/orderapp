@@ -16,14 +16,18 @@ handler = WebhookHandler(CHANNEL_SECRET)
 
 # ✅ 新增：標準化客製化順序
 def normalize_item(item):
-    match = re.match(r'(.+?)（(.+?)）', item)
+    # 將全形括號換成半形
+    item = item.replace("（", "(").replace("）", ")")
+
+    match = re.match(r'(.+?)\((.+?)\)', item)
     if match:
-        name = match.group(1)
+        name = match.group(1).strip()
         custom = match.group(2)
-        options = sorted([opt.strip() for opt in custom.split("/") if opt.strip()])
-        normalized = f"{name}（{'/'.join(options)}）"
-        return normalized
+        options = [opt.strip() for opt in re.split(r"[／/]", custom) if opt.strip()]
+        sorted_custom = "/".join(sorted(options))
+        return f"{name}（{sorted_custom}）"
     return item.strip()
+
 
 def analyze_order(text):
     parts = re.split(r'[-—]{2,}', text.strip())
