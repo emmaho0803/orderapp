@@ -30,6 +30,9 @@ SCOPES = [
 CREDENTIALS_PATH = '/etc/secrets/credentials.json'
 SHEET_NAME = '餐廳資料'
 
+def get_restaurants_data():
+    return load_restaurants_data()
+
 # 初始化 Google 服務
 def init_google_service(service_name='sheets', version='v4'):
     try:
@@ -89,8 +92,8 @@ def load_restaurants_data():
         print(f"載入餐廳資料失敗: {str(e)}")
         return []
 
-# 全局餐廳資料
-RESTAURANTS_DATA = load_restaurants_data()
+def get_restaurants_data():
+    return load_restaurants_data()
 
 def normalize_item(item):
     # 將全形括號與分隔符轉換為半形
@@ -138,7 +141,7 @@ def analyze_order(text):
     return result
 
 def get_restaurant_info(restaurant_name):
-    for r in RESTAURANTS_DATA:
+    for r in get_restaurants_data():
         if r['餐廳名稱'] == restaurant_name:
             info = (
                 f"🍴 {r['餐廳名稱']}\n"
@@ -152,7 +155,7 @@ def get_restaurant_info(restaurant_name):
     return f"找不到 {restaurant_name} 的資訊", None
 
 def recommend_restaurant(category=None):
-    pool = [r for r in RESTAURANTS_DATA if not category or r['類別'] == category]
+    pool = [r for r in get_restaurants_data() if not category or r['類別'] == category]
     if not pool:
         return "找不到符合條件的餐廳", None
     
@@ -168,7 +171,7 @@ def recommend_restaurant(category=None):
     return info, restaurant['圖片url']
 
 def show_help():
-    categories = list(set(r['類別'] for r in RESTAURANTS_DATA if r['類別'] and r['類別'] != '無'))
+    categories = list(set(r['類別'] for r in get_restaurants_data() if r['類別'] and r['類別'] != '無'))
     quick_replies = [
         QuickReplyButton(action=MessageAction(label="隨機推薦", text="今天吃什麼")),
         QuickReplyButton(action=MessageAction(label="餐廳列表", text="餐廳列表"))
@@ -190,10 +193,10 @@ def show_help():
     return help_text, quick_replies
 
 def list_restaurants():
-    return "🍽️ 餐廳列表:\n" + "\n".join(r['餐廳名稱'] for r in RESTAURANTS_DATA), None
+    return "🍽️ 餐廳列表:\n" + "\n".join(r['餐廳名稱'] for r in get_restaurants_data()), None
 
 def list_categories():
-    categories = list(set(r['類別'] for r in RESTAURANTS_DATA if r['類別'] and r['類別'] != '無'))
+    categories = list(set(r['類別'] for r in get_restaurants_data() if r['類別'] and r['類別'] != '無'))
     return "🏷️ 餐廳類別:\n" + "\n".join(sorted(categories)), None
 
 # 訊息處理核心
