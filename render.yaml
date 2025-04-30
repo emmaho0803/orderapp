@@ -10,3 +10,13 @@ services:
         value: your-channel-access-token-here
       - key: CHANNEL_SECRET
         value: your-channel-secret-here
+      - key: GOOGLE_SHEET_KEY
+        value: your-google-sheet-id-here
+      - key: GOOGLE_APPLICATION_CREDENTIALS
+        value: /etc/secrets/credentials.json  # 供 gspread/google-auth 使用
+
+# Secret file mount for credentials.json
+files:
+  - source: credentials.json
+    destination: /etc/secrets/credentials.json
+
