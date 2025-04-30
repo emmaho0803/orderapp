@@ -81,6 +81,7 @@ def load_restaurants_data():
                 '營業時間': row.get('營業時間', '未知'),
                 '地址': row.get('地址', '未知'),
                 '圖片url': get_image_url(row.get('圖片url', ''))
+                '類別': row.get('類別', '無'),
             })
         return restaurants
         
