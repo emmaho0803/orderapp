@@ -91,6 +91,18 @@ def load_restaurants_data():
 # 全局餐廳資料
 RESTAURANTS_DATA = load_restaurants_data()
 
+def normalize_item(item):
+    # 將全形括號與分隔符轉換為半形
+    item = item.replace("（", "(").replace("）", ")").replace("／", "/")
+
+    match = re.match(r'(.+?)\((.+?)\)', item)
+    if match:
+        name = match.group(1).strip()
+        options = [opt.strip() for opt in match.group(2).split("/") if opt.strip()]
+        sorted_custom = "/".join(sorted(options))
+        return f"{name}（{sorted_custom}）"
+    return item.strip()
+
 # 指令處理函數
 def analyze_order(text):
     parts = re.split(r'[-—]{2,}', text.strip())
@@ -105,7 +117,7 @@ def analyze_order(text):
             match = re.search(r'：(.+?)\$?(\d+)', line)
             if match:
                 raw_item = match.group(1).strip()
-                item = re.sub(r'（(.+?)）', lambda m: f"（{'/'.join(sorted(m.group(1).split('/'))}）", raw_item)
+                item = normalize_item(raw_item)
                 price = int(match.group(2))
                 counter[item] += 1
                 if is_attendee:
