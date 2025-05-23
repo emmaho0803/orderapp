@@ -109,7 +109,16 @@ def normalize_item(item):
 
 # 指令處理函數
 def analyze_order(text):
-    parts = re.split(r'[-—]{2,}', text.strip())
+    def full_to_half(s):
+        return s.replace("（", "(").replace("）", ")") \
+                .replace("／", "/").replace("：", ":") \
+                .replace("　", " ").replace("–", "-").replace("—", "-")
+
+    text = full_to_half(text)
+    
+    # 用正則式分割：任意多個「-」「_」或空白組合（至少 2 個以上）
+    parts = re.split(r'[\-_ \t]{2,}', text.strip())
+
     counter = Counter()
     total_attendee = 0
     total_non_attendee = 0
@@ -118,7 +127,7 @@ def analyze_order(text):
         nonlocal total_attendee, total_non_attendee
         lines = section_text.strip().split("\n")
         for line in lines:
-            match = re.search(r'：(.+?)\$?(\d+)', line)
+            match = re.search(r':\s*(.+?)\s*\$?\s*(\d+)', line)
             if match:
                 raw_item = match.group(1).strip()
                 item = normalize_item(raw_item)
@@ -138,6 +147,7 @@ def analyze_order(text):
         parse_section(parts[0], True)
         result = "🍽️ 點餐統計結果：\n" + "\n".join(f"{item}: {count}份" for item, count in counter.items())
         result += f"\n\n💰 總金額：${total_attendee}"
+
     return result
 
 def get_restaurant_info(restaurant_name):
